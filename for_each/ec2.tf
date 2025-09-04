@@ -1,16 +1,17 @@
 resource "aws_instance" "this" {
-    ami = data.aws_ami.joindevops.id
+    for_each = var.instances
+    ami = "ami-09c813fb71547fc4f"
     vpc_security_group_ids = [aws_security_group.allow_tls.id]
-    instance_type = "t3.micro"
+    instance_type = each.value
     tags = {
-        Name = "terraform-demo"
+        Name = each.key
         Purpose = "terraform-practice"
     }
   
 }
 
 resource "aws_security_group" "allow_tls" {
-    name = "allow_tls"
+    name = "allow_tls-1"
     description = "Allow TLS inbound traffic and all outbond traffic"
 
     egress {
@@ -30,3 +31,7 @@ resource "aws_security_group" "allow_tls" {
         Name = "allow tls"
     }
 }
+output "ec2_info" {
+    value = aws_instance.this
+}
+
